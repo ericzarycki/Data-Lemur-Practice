@@ -1,0 +1,11 @@
+with cte as (
+SELECT *,
+ROW_NUMBER() OVER(PARTITION BY EXTRACT(DAY FROM measurement_time) ORDER BY measurement_time) 
+FROM measurements
+)
+SELECT CAST(measurement_time as DATE) as measurement_day,
+SUM(CASE WHEN row_number % 2 != 0 THEN measurement_value END) AS odd_sum,
+SUM(CASE WHEN row_number % 2 = 0 THEN measurement_value END) AS even_sum
+FROM cte
+GROUP BY measurement_day
+ORDER BY measurement_day
